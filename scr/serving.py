@@ -18,12 +18,12 @@ class SceneRecognitionServing(object):
         dist_metrics = self.matcher.distance_metrics(scenes)
         return dist_metrics
 
-    def filter(self, dist_metrics):
+    def filter(self, dist_metrics, thresh=0.3):
         similar_indexes = []
         values, indexes = self.get_top_k(dist_metrics)
 
         for base_index, (k_values, k_indexes) in enumerate(zip(values, indexes)):
-            if all(v > 0.3 for v in k_values):
+            if all(v >= thresh for v in k_values):
                 similar_indexes.append(base_index)
             # for value, compare_index in zip(k_values, k_indexes):
             #     if base_index == compare_index:

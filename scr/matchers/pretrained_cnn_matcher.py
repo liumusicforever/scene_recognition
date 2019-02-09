@@ -27,11 +27,11 @@ class PretrainedCnnMatcher(MatcherBase):
     def distance_metrics(self, scenes, is_norm=True):
         feats = self.get_feats(scenes)
         dist_metrics = self.dist.pairwise(feats, feats)
-        print(dist_metrics)
+        # print(dist_metrics)
         if is_norm:
             # dist_metrics = normalize(dist_metrics, axis=0, norm='l2')
             dist_metrics = self.min_max_scaler.fit_transform(dist_metrics)
-        return dist_metrics
+        return 1 - dist_metrics
 
     def _preprocessing(self, scenes):
         batch_imgs = []

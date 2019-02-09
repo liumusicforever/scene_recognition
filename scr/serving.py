@@ -36,7 +36,7 @@ class SceneRecognitionServing(object):
     def get_top_k(self, dist_metrics):
         input_op = tf.placeholder(dtype=tf.float64)
         top_k_op = tf.nn.top_k(
-            1-input_op,
+            input_op,
             k=3,
             sorted=True,
             name='top_k'

@@ -15,5 +15,5 @@ dist_metrics = src_serving.distance_metrics(scenes)
 print(dist_metrics)
 
 # Split similar and not similar scene
-similar_indexes = src_serving.filter(dist_metrics)
+similar_indexes = src_serving.filter(dist_metrics, thresh=0.31)
 print(similar_indexes)

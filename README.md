@@ -32,8 +32,8 @@ Output:
  [48.19921677 47.7989116  47.80762468  0.        ]]
 '''
 
-# Split similar and not similar scene
-similar_indexes = src_serving.filter(dist_metrics)
+# Get similar indexes
+similar_indexes = src_serving.filter(dist_metrics,thresh = 0.3)
 print(similar_indexes)
 '''
 Output:

@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     scenes = [scene_1_path, scene_2_path, scene_3_path, scene_4_path]
 
-    pb_path = '/root/data/scene_models/triplet_loss/frozen_graph/'
+    pb_path = '/root/dennis_code_base/tf-metric-learning/experiments/scene/softmax_resnet50/1557727162/'
     matcher = TFCnnMatcher(pb_path)
     print(scenes)
-    print(matcher.distance_metrics(scenes))
+    print(matcher.distance_metrics(scenes, is_norm=False))

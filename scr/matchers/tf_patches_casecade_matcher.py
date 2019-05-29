@@ -19,8 +19,8 @@ from matchers.tf_cnn_matcher import TFCnnMatcher
 from tqdm import tqdm
 
 
-class TFPatchesMatcher(MatcherBase):
-    def __init__(self, pb_path, delta=None, crop_ratio=0.3, percent = 0.4):
+class TFPatchesCaseCadeMatcher(MatcherBase):
+    def __init__(self, pb_path, delta=0.8, crop_ratio_list=[0.7,0.5,0.3], percent = 0.4):
         self.batch_size = 10
         self.matcher = TFCnnMatcher(pb_path)
         self.dist = DistanceMetric.get_metric('euclidean')
@@ -28,7 +28,7 @@ class TFPatchesMatcher(MatcherBase):
 
         self.resize = 224
         self.delta = delta
-        self.crop_ratio = crop_ratio
+        self.crop_ratio_list = crop_ratio_list
         self.percent = percent
 
     def distance_metrics(self, scenes, is_norm=True):
@@ -117,15 +117,15 @@ class TFPatchesMatcher(MatcherBase):
                     # yield the current window
                     yield (x, y, image[y:y + windowSize[1], x:x + windowSize[0]])
 
-        crop_ratio = self.crop_ratio
         # crop images
         H, W = img.shape[:2]
         segments = []
-        for x, y, patch_img in sliding_window(img, int(H * crop_ratio / 2), [int(H * crop_ratio), int(W * crop_ratio)]):
-            h, w = patch_img.shape[:2]
-            if min([h, w]) / max([h, w]) < 0.5:
-                continue
-            segments.append(patch_img)
+        for crop_ratio in self.crop_ratio_list:
+            for x, y, patch_img in sliding_window(img, int(H * crop_ratio / 2), [int(H * crop_ratio), int(W * crop_ratio)]):
+                h, w = patch_img.shape[:2]
+                if min([h, w]) / max([h, w]) < 0.5:
+                    continue
+                segments.append(patch_img)
         return segments
 
     def _imread(self, img_path):
@@ -147,6 +147,6 @@ if __name__ == "__main__":
     # print(scenes)
     # print(matcher.distance_metrics(scenes))
 
-    matcher = TFPatchesMatcher(SOFTMAX_MODEL_PATH, delta=1,crop_ratio=0.4)
+    matcher = TFPatchesCaseCadeMatcher(SOFTMAX_MODEL_PATH, delta=0.85)
     print(scenes)
     print(matcher.distance_metrics(scenes))

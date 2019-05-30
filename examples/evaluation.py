@@ -30,11 +30,11 @@ def draw_pr_curve(precision, recall, color='b', title='PR Curve', marker=">"):
     step_kwargs = ({'step': 'post'}
                    if 'step' in signature(plt.fill_between).parameters
                    else {})
-    plt.step(recall, precision, color=color, alpha=0.2,
-             where='post')
+    # plt.step(recall, precision, color=color, alpha=0.2,
+    #          where='post')
 
-    # plt.plot(recall, precision, color=color)
-    plt.scatter(recall, precision, color=color, marker=marker)
+    plt.plot(recall, precision, color=color)
+    # plt.scatter(recall, precision, color=color, marker=marker)
     # plt.fill_between(recall, precision, alpha=0.2, color=color, **step_kwargs)
 
     plt.title(title)

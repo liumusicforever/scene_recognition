@@ -9,7 +9,7 @@ from matchers.pretrained_cnn_matcher import PretrainedCnnMatcher
 from matchers.cnn_patches_matcher import CnnPatchesMatcher
 from matchers.tf_patches_matcher import TFPatchesMatcher
 from matchers.tf_cnn_matcher import TFCnnMatcher
-from matchers.inceptionv4_matcher import InceptionV4Matcher
+# from matchers.inceptionv4_matcher import InceptionV4Matcher
 from matchers.tf_local_global_matcher import TFLocalGlobalMatcher
 from matchers.tf_patches_casecade_matcher import TFPatchesCaseCadeMatcher
 
@@ -98,7 +98,7 @@ class SceneRecognitionServing(object):
             self.matcher = TFPatchesMatcher(pb_path, delta=1.1, crop_ratio=0.4)
         elif model == 'inceptionv4_cnn':
             Inception_PATH = '/root/data/scene_recognition/static//checkpoints'
-            self.matcher = InceptionV4Matcher(Inception_PATH)
+            # self.matcher = InceptionV4Matcher(Inception_PATH)
 
         elif model == 'crop1.0percent1':
             pb_path = SOFTMAX_GOOGLE_PATH
@@ -252,6 +252,12 @@ class SceneRecognitionServing(object):
 
         return similar_indexes
 
+    def dist_metrics_with_user_mask(self, dist_metrics, user_info):
+        for user , indexes in user_info.items():
+            for index in indexes:
+                dist_metrics[indexes,index] = 0
+        return dist_metrics
+
     def get_top_k(self, dist_metrics):
         values, indexes = self.sess.run(
             self.top_k_op, feed_dict={self.input_op: dist_metrics})
@@ -265,14 +271,22 @@ if __name__ == "__main__":
     scene_4_path = 'img/scene_4.jpg'
 
     scenes = [scene_1_path, scene_2_path, scene_3_path, scene_4_path]
+    user_info = {
+        'tom': [0, 1],
+        'san': [2, 3]
+    }
 
     # create scene recognition serving
-    src_serving = SceneRecognitionServing(model='softmax_patch_cnn')
+    src_serving = SceneRecognitionServing(model='softmax_google_cnn')
 
     # Get distance metrics
     dist_metrics = src_serving.distance_metrics(scenes, is_norm=True)
+    print(dist_metrics)
+
+    dist_metrics = src_serving.dist_metrics_with_user_mask(dist_metrics,user_info)
+    print(dist_metrics)
 
     # Split similar and not similar scene
     similar_indexes = src_serving.filter(dist_metrics, 0.1)
-    print(dist_metrics)
+
     print(similar_indexes)

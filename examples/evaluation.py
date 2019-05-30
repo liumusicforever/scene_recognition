@@ -73,8 +73,11 @@ def eval_model(data_root, model, k_similar=3):
         # if store_name != '66_inscene': continue
         print('processing store : {} ({}/{})'.format(store_name, i, len(db.image_ids_group_by_store.keys())))
         img_list = [db.image_paths[img_id] for img_id in img_ids]
+        _label = [db.image_labels[img_id] for img_id in img_ids]
 
+        user_info = {'fake_user':[a for a in range(len(_label)) if _label[a]==1]}
         dist_metrics = src_serving.distance_metrics(img_list)
+        dist_metrics = src_serving.dist_metrics_with_user_mask(dist_metrics, user_info)
 
         for thresh in threshold_list:
 
@@ -93,7 +96,7 @@ def eval_model(data_root, model, k_similar=3):
             _preds = [1 for i in range(len(img_ids))]
             for sim_index in similar_indexes:
                 _preds[sim_index] = 0
-            _label = [db.image_labels[img_id] for img_id in img_ids]
+
             # cost_b = time.time()-start_b
 
             # start_c = time.time()
@@ -136,9 +139,11 @@ def eval_all():
     data_root = '/root/data/new_restaurant3_dataset_/'
     # model_types = ['cnn', 'softmax_cnn', 'triplet_cnn', 'patch_cnn', 'softmax_patch_cnn', 'triplet_patch_cnn']
     model_types = [
-        'base_google_cnn',
-        'softmax_google_cnn',
-        'triplet_google_cnn']
+        'softmax_google_global_local_delta0.9_crop.5.9',
+        'softmax_google_global_local_delta1.0_crop.5.9',
+        'softmax_google_global_local_delta1.1_crop.5.9',
+        'softmax_google_global_local_delta1.2_crop.5.9',
+        'softmax_google_cnn']
 
     colors = ['k', 'g', 'r', 'r', 'k', 'k', 'k', 'k']
     markers = ["o", "+", "^", "s", "x", "+", "o", "^"]

@@ -22,7 +22,7 @@ from scr.serving import SceneRecognitionServing
 
 import time
 
-threshold_list = [i * 0.05 for i in range(20)]
+threshold_list = [i * 0.02 for i in range(50)]
 output_log = [[thresh] for thresh in threshold_list]
 
 

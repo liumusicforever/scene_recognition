@@ -20,6 +20,11 @@ TRIPLET_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/sce
 SOFTMAX_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene/softmax_resnet50/1557727162/'
 BASE_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene/resnet50/1559086972/'
 
+PYRAMID_BOTTLENECK_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene0528/pyramid_bottleneck/1559148095/'
+FG_ATTENTION_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene0528/fg_atten_model/1559260882/'
+FG_NO_ATTENTION_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene0528/fg_no_atten_model/1559276413'
+
+
 
 class SceneRecognitionServing(object):
     def __init__(self, model='cnn', k_similar=3):
@@ -47,6 +52,15 @@ class SceneRecognitionServing(object):
             self.matcher = TFCnnMatcher(pb_path)
         elif model == 'softmax_google_cnn':
             pb_path = SOFTMAX_GOOGLE_PATH
+            self.matcher = TFCnnMatcher(pb_path)
+        elif model == 'pyramid_bottleneck_google_cnn':
+            pb_path = PYRAMID_BOTTLENECK_GOOGLE_PATH
+            self.matcher = TFCnnMatcher(pb_path)
+        elif model == 'fg_attention_google_cnn':
+            pb_path = FG_ATTENTION_GOOGLE_PATH
+            self.matcher = TFCnnMatcher(pb_path)
+        elif model == 'fg_no_attention_google_cnn':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
             self.matcher = TFCnnMatcher(pb_path)
         elif model == 'softmax_google_patch_cnn_60percent':
             pb_path = SOFTMAX_GOOGLE_PATH

@@ -13,16 +13,26 @@ from matchers.tf_cnn_matcher import TFCnnMatcher
 from matchers.tf_local_global_matcher import TFLocalGlobalMatcher
 from matchers.tf_patches_casecade_matcher import TFPatchesCaseCadeMatcher
 
-TRIPLET_PLACE_PATH = '/root/data/scene_models/triplet_loss/frozen_graph/'
-SOFTMAX_PLACE_PATH = '/root/data/scene_models/softmax_loss/frozen_graph/'
+TRIPLET_PLACE_PATH = 'models/triplet_place365/'
+SOFTMAX_PLACE_PATH = 'models/softmax_place365/'
 
-TRIPLET_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene/triplet_resnet50/1557727201/'
-SOFTMAX_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene/softmax_resnet50/1557727162/'
-BASE_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene/resnet50/1559086972/'
+TRIPLET_GOOGLE_PATH = 'models/triplet_our_dataset/'
+SOFTMAX_GOOGLE_PATH = 'models/softmax_our_dataset/'
+BASE_GOOGLE_PATH = 'models/base_our_dataset/'
 
-PYRAMID_BOTTLENECK_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene0528/pyramid_bottleneck/1559148095/'
-FG_ATTENTION_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene0528/fg_atten_model/1559260882/'
-FG_NO_ATTENTION_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene0528/fg_no_atten_model/1559276413'
+SOFTMAX_L2_GOOGLE_PATH = 'models/softmax_l2_our_dataset/'
+MLE_GOOGLE_PATH = 'models/mle_our_dataset/'
+
+
+# TRIPLET_PLACE_PATH = '/root/data/scene_models/triplet_loss/frozen_graph/'
+# SOFTMAX_PLACE_PATH = '/root/data/scene_models/softmax_loss/frozen_graph/'
+#
+# TRIPLET_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene/triplet_resnet50/1557727201/'
+# SOFTMAX_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene/softmax_resnet50/1557727162/'
+# BASE_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene/resnet50/1559086972/'
+#
+# SOFTMAX_L2_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene0528/pyramid_bottleneck/1559148095/'
+# MLE_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene0528/fg_no_atten_model/1559276413'
 
 
 class SceneRecognitionServing(object):
@@ -33,52 +43,52 @@ class SceneRecognitionServing(object):
             pb_path = BASE_GOOGLE_PATH
             self.matcher = TFCnnMatcher(pb_path)
         elif model == 'mle':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFCnnMatcher(pb_path)
         elif model == 'mle_crop.3':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.3])
         elif model == 'mle_crop.5':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.5])
         elif model == 'mle_crop.7':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.7])
         elif model == 'mle_crop.9':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.9])
 
         elif model == 'mle_crop.3.5':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.3, 0.5])
         elif model == 'mle_crop.3.5.7':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.3, 0.5, 0.7])
         elif model == 'mle_crop.5.7':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.5, 0.7])
         elif model == 'mle_crop.5.7.9':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.5, 0.7, 0.9])
         elif model == 'mle_crop.7.9':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.7, 0.9])
 
 
         elif model == 'mle_delta_0.8':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=0.8, crop_ratio_list=[0.7])
         elif model == 'mle_delta_0.9':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=0.9, crop_ratio_list=[0.7])
         elif model == 'mle_delta_1.0':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.7])
         elif model == 'mle_delta_1.1':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.1, crop_ratio_list=[0.7])
         elif model == 'mle_delta_1.2':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.2, crop_ratio_list=[0.7])
 
         elif model == 'facenet':
@@ -110,14 +120,11 @@ class SceneRecognitionServing(object):
         elif model == 'softmax_google_cnn':
             pb_path = SOFTMAX_GOOGLE_PATH
             self.matcher = TFCnnMatcher(pb_path)
-        elif model == 'pyramid_bottleneck_google_cnn':
-            pb_path = PYRAMID_BOTTLENECK_GOOGLE_PATH
-            self.matcher = TFCnnMatcher(pb_path)
-        elif model == 'fg_attention_google_cnn':
-            pb_path = FG_ATTENTION_GOOGLE_PATH
+        elif model == 'softmax_l2_google_cnn':
+            pb_path = SOFTMAX_L2_GOOGLE_PATH
             self.matcher = TFCnnMatcher(pb_path)
         elif model == 'fg_no_attention_google_cnn':
-            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            pb_path = MLE_GOOGLE_PATH
             self.matcher = TFCnnMatcher(pb_path)
         elif model == 'softmax_google_patch_cnn_60percent':
             pb_path = SOFTMAX_GOOGLE_PATH

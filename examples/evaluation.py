@@ -147,7 +147,7 @@ def eval_all():
     #     'pretrained',
     #     'resnet50',
     #     'facenet',
-    #     'pyramid_bottleneck_google_cnn',
+    #     'softmax_l2_google_cnn',
     #     'triplet_google_cnn',
     # ]
 

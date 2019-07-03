@@ -40,3 +40,13 @@ Output:
 [0, 1, 2]
 '''
 ```
+
+## Dataset and Trained weights
+* Download on https://drive.google.com/drive/folders/1uQHmlLky6z-aV4yWxI1nuv8LHBpJ4b4x?usp=sharing
+
+## Experiments scripts example
+```
+python3 examples/evaluation.py
+python3 examples/experiments_ploter.py
+
+```

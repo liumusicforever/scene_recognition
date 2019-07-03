@@ -25,9 +25,66 @@ FG_ATTENTION_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiment
 FG_NO_ATTENTION_GOOGLE_PATH = '/root/dennis_code_base/tf-metric-learning/experiments/scene0528/fg_no_atten_model/1559276413'
 
 
-
 class SceneRecognitionServing(object):
     def __init__(self, model='cnn', k_similar=3):
+        if model == 'pretrained':
+            self.matcher = PretrainedCnnMatcher()
+        if model == 'resnet50':
+            pb_path = BASE_GOOGLE_PATH
+            self.matcher = TFCnnMatcher(pb_path)
+        elif model == 'mle':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFCnnMatcher(pb_path)
+        elif model == 'mle_crop.3':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.3])
+        elif model == 'mle_crop.5':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.5])
+        elif model == 'mle_crop.7':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.7])
+        elif model == 'mle_crop.9':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.9])
+
+        elif model == 'mle_crop.3.5':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.3, 0.5])
+        elif model == 'mle_crop.3.5.7':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.3, 0.5, 0.7])
+        elif model == 'mle_crop.5.7':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.5, 0.7])
+        elif model == 'mle_crop.5.7.9':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.5, 0.7, 0.9])
+        elif model == 'mle_crop.7.9':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.7, 0.9])
+
+
+        elif model == 'mle_delta_0.8':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=0.8, crop_ratio_list=[0.7])
+        elif model == 'mle_delta_0.9':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=0.9, crop_ratio_list=[0.7])
+        elif model == 'mle_delta_1.0':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.0, crop_ratio_list=[0.7])
+        elif model == 'mle_delta_1.1':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.1, crop_ratio_list=[0.7])
+        elif model == 'mle_delta_1.2':
+            pb_path = FG_NO_ATTENTION_GOOGLE_PATH
+            self.matcher = TFLocalGlobalMatcher(pb_path, delta=1.2, crop_ratio_list=[0.7])
+
+        elif model == 'facenet':
+            pb_path = SOFTMAX_GOOGLE_PATH
+            self.matcher = TFCnnMatcher(pb_path)
+
         if model == 'cnn':
             self.matcher = PretrainedCnnMatcher()
         elif model == 'patch_cnn':
@@ -267,9 +324,9 @@ class SceneRecognitionServing(object):
         return similar_indexes
 
     def dist_metrics_with_user_mask(self, dist_metrics, user_info):
-        for user , indexes in user_info.items():
+        for user, indexes in user_info.items():
             for index in indexes:
-                dist_metrics[indexes,index] = 0
+                dist_metrics[indexes, index] = 0
         return dist_metrics
 
     def get_top_k(self, dist_metrics):
@@ -297,7 +354,7 @@ if __name__ == "__main__":
     dist_metrics = src_serving.distance_metrics(scenes, is_norm=True)
     print(dist_metrics)
 
-    dist_metrics = src_serving.dist_metrics_with_user_mask(dist_metrics,user_info)
+    dist_metrics = src_serving.dist_metrics_with_user_mask(dist_metrics, user_info)
     print(dist_metrics)
 
     # Split similar and not similar scene

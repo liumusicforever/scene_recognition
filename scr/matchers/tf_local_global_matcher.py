@@ -66,7 +66,7 @@ class TFLocalGlobalMatcher(MatcherBase):
 
         local_dist = (local_dist - np.min(local_dist)) / (np.max(local_dist) - np.min(local_dist))
 
-        dist_metrics = (global_dist + 2 * local_dist) / 3
+        dist_metrics = (2 * global_dist + local_dist) / 3
 
         return dist_metrics
 

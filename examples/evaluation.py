@@ -26,7 +26,7 @@ threshold_list = [i * 0.02 for i in range(50)]
 output_log = [[thresh] for thresh in threshold_list]
 
 
-def draw_pr_curve(precision, recall, color='b', title='PR Curve', marker=">"):
+def draw_pr_curve(precision, recall, color='b', title='ROC Curve', marker=">"):
     step_kwargs = ({'step': 'post'}
                    if 'step' in signature(plt.fill_between).parameters
                    else {})
@@ -34,12 +34,14 @@ def draw_pr_curve(precision, recall, color='b', title='PR Curve', marker=">"):
     #          where='post')
 
     plt.plot(recall, precision, color=color)
+    # plt.plot(recall, precision, color=color, marker=marker)
+
     # plt.scatter(recall, precision, color=color, marker=marker)
     # plt.fill_between(recall, precision, alpha=0.2, color=color, **step_kwargs)
 
     plt.title(title)
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
+    plt.xlabel('FPR')
+    plt.ylabel('TPR')
     plt.ylim([0.0, 1.05])
     plt.xlim([0.0, 1.0])
 
@@ -70,12 +72,11 @@ def eval_model(data_root, model, k_similar=3):
 
     confus_metric = dict()
     for i, (store_name, img_ids) in enumerate(db.image_ids_group_by_store.items()):
-        # if store_name != '66_inscene': continue
         print('processing store : {} ({}/{})'.format(store_name, i, len(db.image_ids_group_by_store.keys())))
         img_list = [db.image_paths[img_id] for img_id in img_ids]
         _label = [db.image_labels[img_id] for img_id in img_ids]
 
-        user_info = {'fake_user':[a for a in range(len(_label)) if _label[a]==1]}
+        user_info = {'fake_user': [a for a in range(len(_label)) if _label[a] == 1]}
         dist_metrics = src_serving.distance_metrics(img_list)
         dist_metrics = src_serving.dist_metrics_with_user_mask(dist_metrics, user_info)
 
@@ -139,27 +140,65 @@ def eval_all():
     data_root = '/root/data/new_restaurant3_dataset_/'
     # model_types = ['cnn', 'softmax_cnn', 'triplet_cnn', 'patch_cnn', 'softmax_patch_cnn', 'triplet_patch_cnn']
     model_types = [
-        'softmax_google_global_local_delta0.9_crop.5.9',
-        'softmax_google_global_local_delta1.0_crop.5.9',
-        'softmax_google_global_local_delta1.1_crop.5.9',
-        'softmax_google_global_local_delta1.2_crop.5.9',
-        'softmax_google_cnn']
+        'pretrained',
+        'resnet50',
+        'mle',
+        'mle_crop.3',
+        'mle_crop.5',
+        'mle_crop.7',
+        'mle_crop.9',
+        'mle_crop.3.5',
+        'mle_crop.3.5.7',
+        'mle_crop.5.7',
+        'mle_crop.5.7.9',
+        'mle_crop.7.9',
+        'mle_delta_0.8',
+        'mle_delta_0.9',
+        'mle_delta_1.0',
+        'mle_delta_1.1',
+        'mle_delta_1.2',
+        'facenet',
+    ]
 
-    colors = ['k', 'g', 'r', 'r', 'k', 'k', 'k', 'k']
-    markers = ["o", "+", "^", "s", "x", "+", "o", "^"]
-    # colors = ['b', 'b', 'b', 'g', 'g', 'g']
-    # markers = ["o", "+", "^", "o", "+", "^", ]
+    model_types = [
+        'pretrained',
+        'resnet50',
+        'facenet',
+        'pyramid_bottleneck_google_cnn',
+        'triplet_google_cnn',
+    ]
 
+    # colors = ['k', 'k', 'k', 'k', 'k', 'k', 'b', 'b', 'b', 'b', 'b', 'b', 'r', 'r', 'r', 'r', 'r', 'r']
+    # markers = ["o", "+", "^", "s", "x", "+", "o", "+", "^", "s", "x", "+", "o", "+", "^", "s", "x", "+"]
+    colors = ['r', 'g', 'b', 'k', 'g', 'g']
+    markers = ["o", "+", "^", "o", "+", "^", ]
+    #
     results = {}
+    #
+    # k_list = [2,3,5,7]
+    # model = 'fg_no_attention_google_cnn'
+    # model_types = []
+    # for k in k_list:
+    #     res = eval_model(data_root, model,k_similar=k)
+    #     results[model+'_k{}'.format(k)] = res
+    #     model_types.append(model+'_k{}'.format(k))
+    #
+    #
+    # for model, res in results.items():
+    #     i = model_types.index(model)
+    #     ap, ar = res[:]
+    #     draw_pr_curve(ap, ar, color=colors[i], marker=markers[i])
+    # plt.legend(['v=1', 'v=2', 'v=4', 'v=6'])
+
     for i, model in enumerate(model_types):
         res = eval_model(data_root, model)
         results[model] = res
-
     for model, res in results.items():
         i = model_types.index(model)
         ap, ar = res[:]
         draw_pr_curve(ap, ar, color=colors[i], marker=markers[i])
-    save_path = 'pr_curve.png'
+
+    save_path = 'exp0.png'
     plt.savefig(save_path)
     plt.cla()
 

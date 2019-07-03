@@ -10,11 +10,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from itertools import cycle
 
-from sklearn.utils.fixes import signature
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
 from sklearn.metrics import confusion_matrix
 
 from scr.utils import ScenceDataset
@@ -27,36 +23,14 @@ output_log = [[thresh] for thresh in threshold_list]
 
 
 def draw_pr_curve(precision, recall, color='b', title='ROC Curve', marker=">"):
-    step_kwargs = ({'step': 'post'}
-                   if 'step' in signature(plt.fill_between).parameters
-                   else {})
-    # plt.step(recall, precision, color=color, alpha=0.2,
-    #          where='post')
-
-    plt.plot(recall, precision, color=color)
-    # plt.plot(recall, precision, color=color, marker=marker)
-
-    # plt.scatter(recall, precision, color=color, marker=marker)
-    # plt.fill_between(recall, precision, alpha=0.2, color=color, **step_kwargs)
+    # plt.plot(recall, precision, color=color)
+    plt.plot(recall, precision, color=color, marker=marker)
 
     plt.title(title)
     plt.xlabel('FPR')
     plt.ylabel('TPR')
     plt.ylim([0.0, 1.05])
     plt.xlim([0.0, 1.0])
-
-
-def precision(y_true, y_pred):
-    each_class_precision = precision_score(y_true, y_pred, average=None)
-    ap = precision_score(y_true, y_pred, average='macro')
-
-    return each_class_precision[1]
-
-
-def recall(y_true, y_pred):
-    each_class_recall = recall_score(y_true, y_pred, average=None)
-    ar = recall_score(y_true, y_pred, average='macro')
-    return each_class_recall[1]
 
 
 def eval_model(data_root, model, k_similar=3):
@@ -66,9 +40,6 @@ def eval_model(data_root, model, k_similar=3):
     print(model)
     # create scene recognition serving
     src_serving = SceneRecognitionServing(model=model, k_similar=k_similar)
-
-    preds = dict()
-    labels = dict()
 
     confus_metric = dict()
     for i, (store_name, img_ids) in enumerate(db.image_ids_group_by_store.items()):
@@ -80,6 +51,7 @@ def eval_model(data_root, model, k_similar=3):
         dist_metrics = src_serving.distance_metrics(img_list)
         dist_metrics = src_serving.dist_metrics_with_user_mask(dist_metrics, user_info)
 
+        # For testing different threshold on predict distance metrix
         for thresh in threshold_list:
 
             # start_a = time.time()
@@ -111,10 +83,8 @@ def eval_model(data_root, model, k_similar=3):
             confus_metric[thresh]['tp'] += tp
             # cost_d = time.time() - start_d
 
-            # print('a:{},b:{},c:{},d:{}'.format(cost_a,cost_b,cost_c,cost_d))
-
-    ap_list = []
-    ar_list = []
+    tpr_list = []
+    fpt_list = []
 
     for i, thresh in enumerate(threshold_list):
         tn = confus_metric[thresh]['tn']
@@ -126,19 +96,18 @@ def eval_model(data_root, model, k_similar=3):
 
         tpr = tp / (tp + fn)
         fpr = fp / (fp + tn)
-        # ap = precision(_label, _pred)
-        ap_list.append(tpr)
-        # ar = recall(_label, _pred)
-        ar_list.append(fpr)
+        tpr_list.append(tpr)
+        fpt_list.append(fpr)
 
         output_log[i].extend([str(tpr), str(fpr)])
 
-    return [ap_list, ar_list]
+    return [tpr_list, fpt_list]
 
 
 def eval_all():
     data_root = '/root/data/new_restaurant3_dataset_/'
-    # model_types = ['cnn', 'softmax_cnn', 'triplet_cnn', 'patch_cnn', 'softmax_patch_cnn', 'triplet_patch_cnn']
+    results = {}
+
     model_types = [
         'pretrained',
         'resnet50',
@@ -159,21 +128,33 @@ def eval_all():
         'mle_delta_1.2',
         'facenet',
     ]
+    colors = ['k', 'k', 'k', 'k', 'k', 'k', 'b', 'b', 'b', 'b', 'b', 'b', 'r', 'r', 'r', 'r', 'r', 'r']
+    markers = ["o", "+", "^", "s", "x", "+", "o", "+", "^", "s", "x", "+", "o", "+", "^", "s", "x", "+"]
 
-    model_types = [
-        'pretrained',
-        'resnet50',
-        'facenet',
-        'pyramid_bottleneck_google_cnn',
-        'triplet_google_cnn',
-    ]
+    for i, model in enumerate(model_types):
+        res = eval_model(data_root, model)
+        results[model] = res
+    for model, res in results.items():
+        i = model_types.index(model)
+        ap, ar = res[:]
+        draw_pr_curve(ap, ar, color=colors[i], marker=markers[i])
 
-    # colors = ['k', 'k', 'k', 'k', 'k', 'k', 'b', 'b', 'b', 'b', 'b', 'b', 'r', 'r', 'r', 'r', 'r', 'r']
-    # markers = ["o", "+", "^", "s", "x", "+", "o", "+", "^", "s", "x", "+", "o", "+", "^", "s", "x", "+"]
-    colors = ['r', 'g', 'b', 'k', 'g', 'g']
-    markers = ["o", "+", "^", "o", "+", "^", ]
+    """
+    # NOTE: For experiment on testing top-k matching images performance
+    """
+
+    # model_types = [
+    #     'pretrained',
+    #     'resnet50',
+    #     'facenet',
+    #     'pyramid_bottleneck_google_cnn',
+    #     'triplet_google_cnn',
+    # ]
+
+    # colors = ['r', 'g', 'b', 'k', 'g', 'g']
+    # markers = ["o", "+", "^", "o", "+", "^", ]
+
     #
-    results = {}
     #
     # k_list = [2,3,5,7]
     # model = 'fg_no_attention_google_cnn'
@@ -190,19 +171,15 @@ def eval_all():
     #     draw_pr_curve(ap, ar, color=colors[i], marker=markers[i])
     # plt.legend(['v=1', 'v=2', 'v=4', 'v=6'])
 
-    for i, model in enumerate(model_types):
-        res = eval_model(data_root, model)
-        results[model] = res
-    for model, res in results.items():
-        i = model_types.index(model)
-        ap, ar = res[:]
-        draw_pr_curve(ap, ar, color=colors[i], marker=markers[i])
-
     save_path = 'exp0.png'
     plt.savefig(save_path)
     plt.cla()
 
     import csv
+    """
+    All TPR and FPR will be saved in result.csv ,
+    Can use script examples/experiments_ploter.py to choice drawing curve combinations.
+    """
     with open("result.csv", "w", newline='') as f:
         writer = csv.writer(f, delimiter=',')
         for row in output_log:
